@@ -10,6 +10,7 @@
 2D images of sections of pig heart and lungs taken with the Axioscan
 
 *Hematoxylin* channel: tissue
+
 *DAB* channel: red blood cells
 
 ### Plugin description
