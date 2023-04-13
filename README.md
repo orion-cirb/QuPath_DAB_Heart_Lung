@@ -24,4 +24,4 @@
 
 ### Version history
 
-Version 1 released on Apris 13, 2022.
+Version 1 released on April 13, 2022.
