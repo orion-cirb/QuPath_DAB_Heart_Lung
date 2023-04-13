@@ -1,4 +1,4 @@
-# QuPath_DAB_Heart8Lung
+# QuPath_DAB_Heart_Lung
 
 * **Developed for:** Iris
 * **Team:** Germain
