@@ -65,7 +65,6 @@ for (entry in project.getImageList()) {
     def server = imageData.getServer()
     def cal = server.getPixelCalibration()
     def pixelWidth = cal.getPixelWidth().doubleValue()
-    def pixelUnit = cal.getPixelWidthUnit()
     def imgName = entry.getImageName()
     setBatchProjectAndImage(project, imageData)
     setImageType('BRIGHTFIELD (H-DAB)')
@@ -97,10 +96,14 @@ for (entry in project.getImageList()) {
     selectObjects(tissues)
     createDetectionsFromPixelClassifier(dabClassifier, 1, 1, 'SPLIT')
     def dabCells = getDetectionObjects().findAll({it.getPathClass() == dabClass})
+    deselectAll()
+    selectObjects(dabCells)
+    addPixelClassifierMeasurements(dabClassifier, '')
 
     for (an in annotations) {
         println '--- Saving results for annotation ' + an.getName() + ' ---'
         def tissue = tissues.find({it.getParent() == an})
+        tissue.setName(an.getName())
         def cells = dabCells.findAll({it.getParent() == tissue})
 
         deselectAll()
