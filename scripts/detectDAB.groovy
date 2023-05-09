@@ -1,3 +1,13 @@
+
+//-------------------------------------------- PARAMETERS TO MODIFY ----------------------------------------------//
+def DABmodelName = 'DAB'  // fichier .json
+def minDABarea = 3 // microns^2
+def minDABholeArea = 1 // microns^2
+
+//----------------------------------------------------------------------------------------------------------------//
+
+
+
 import qupath.lib.gui.dialogs.Dialogs
 import static qupath.lib.scripting.QP.*
 import qupath.lib.objects.classes.PathClass
@@ -14,23 +24,23 @@ if (!project.getPixelClassifiers().contains('tissue')) {
 def tissueClassifier = project.getPixelClassifiers().get('tissue')
 def tissueClass = PathClass.fromString('Tissue', makeRGB(150, 200, 200))
 
-if (! project.getPixelClassifiers().contains('DAB')) {
-    Dialogs.showErrorMessage('Problem', 'No DAB classifier found')
+if (! project.getPixelClassifiers().contains(DABmodelName)) {
+    Dialogs.showErrorMessage('Problem', 'No ' + DABmodelName + ' classifier found')
     return
 }
-def dabClassifier = project.getPixelClassifiers().get('DAB')
+def dabClassifier = project.getPixelClassifiers().get(DABmodelName)
 def dabClass = PathClass.fromString('DAB', makeRGB(0, 255, 0))
 
 // Create results file and write headers
 def imageDir = new File(project.getImageList()[0].getURIs()[0]).getParent()
-def resultsDir = buildFilePath(imageDir, '/Results')
+def resultsDir = buildFilePath(imageDir, '/Results '+ String.format('%tF %<tH.%<tM', java.time.LocalDateTime.now()))
 if (!fileExists(resultsDir)) mkdirs(resultsDir)
 def resultsFile = new File(buildFilePath(resultsDir, 'detailedResults.xls'))
 resultsFile.createNewFile()
 resultsFile.write("Image name\tAnnotation name\tDAB object area (um2)\n")
 def globalResultsFile = new File(buildFilePath(resultsDir, 'globalResults.xls'))
 globalResultsFile.createNewFile()
-globalResultsFile.write("Image name\tAnnotation name\tAnnotation area (um2)\tTissue area (um2)\tNb DAB objects\tDAB objects total area (um2)\tDAB objects mean area (um2)\tDAB objects area std\n")
+globalResultsFile.write("Image name\tAnnotation name\tAnnotation area (um2)\tTissue area (um2)\tDAB model name\tNb DAB objects\tDAB objects total area (um2)\tDAB objects mean area (um2)\tDAB objects area std\n")
 
 // Save annotations
 def saveAnnotations(imgName) {
@@ -94,7 +104,7 @@ for (entry in project.getImageList()) {
     println '- Finding DAB objects in image -'
     deselectAll()
     selectObjects(tissues)
-    createDetectionsFromPixelClassifier(dabClassifier, 1, 1, 'SPLIT')
+    createDetectionsFromPixelClassifier(dabClassifier, minDABarea, minDABholeArea, 'SPLIT')
     def dabCells = getDetectionObjects().findAll({it.getPathClass() == dabClass})
     deselectAll()
     selectObjects(dabCells)
@@ -128,7 +138,7 @@ for (entry in project.getImageList()) {
         }
         def cellsStatistics = getObjectsAreaStatistics(cells, pixelWidth)
         def globalResults = imgName + "\t" + anDil.getName() + "\t" + anDil.getROI().getScaledArea(pixelWidth, pixelWidth) + "\t" +
-                            tissue.getROI().getScaledArea(pixelWidth, pixelWidth) + "\t" + cells.size() + "\t" + cellsStatistics[0] + "\t" +
+                            tissue.getROI().getScaledArea(pixelWidth, pixelWidth) + "\t" + DABmodelName + "\t" + cells.size() + "\t" + cellsStatistics[0] + "\t" +
                             cellsStatistics[1] + "\t" + cellsStatistics[2] + "\n"
         globalResultsFile << globalResults
     }

@@ -11,7 +11,7 @@ clearAllObjects()
 
 // Load annotations files for current image
 def p = ~/${imageName}.*\.annot/
-def resultsDir = new File(buildFilePath(imageDir+'/Results'))
+def resultsDir = new File(buildFilePath(imageDir+'/Results 2023-05-09 10.21'))
 resultsDir.eachFileMatch(p) {file ->
     new File(file.path).withObjectInputStream {
         def annotations = it.readObject()
